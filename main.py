@@ -449,8 +449,8 @@ async def root():
         <div class="container">
             <h1>🔍 Verus Ticker API</h1>
             <div class="subtitle">
-                <strong>Version:</strong> 1.0.0 | <strong>Status:</strong> <span class="status">✅ Active</span> | <strong>Base URL:</strong> http://localhost:8765<br>
-                <strong>Current Block:</strong> <span id="block-height">Loading...</span> | <strong>Cache:</strong> <span id="cache-refresh">Loading...</span>
+                <strong>Version:</strong> 2.0 | <strong>Status:</strong> <span class="status">✅ Active</span> | <strong>Base URL:</strong> http://localhost:8765<br>
+                
             </div>
             
             <div class="api-section">
@@ -480,7 +480,7 @@ async def root():
                 
             </div>
             
-            <h2>🔍 VRSC/vETH Trace Process Documentation</h2>
+            <h2>🔍 Example Pair Trace Process Documentation</h2>
             <p>This explains how we trace and calculate the VRSC/vETH trading pair in the NATI🦉 converter using CLI commands.</p>
             
             <div class="step-box">
