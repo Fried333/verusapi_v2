@@ -18,29 +18,22 @@ from dotenv import load_dotenv
 # Import currency mapping from the official dict.py
 from dict import normalize_currency_name, get_ticker_by_id
 
-# Default RPC connection settings
-VERUS_RPC_HOST = "127.0.0.1"
-VERUS_RPC_PORT = 27486
-VERUS_RPC_USER = "user"
-VERUS_RPC_PASSWORD = "password"
+def get_default_port(chain):
+    """Get default RPC port for a given chain"""
+    defaults = {
+        "VRSC": "27486",
+        "CHIPS": "22778", 
+        "VARRR": "20778",
+        "VDEX": "21778"
+    }
+    return defaults.get(chain, "27486")  # VRSC as fallback
 
 def load_rpc_settings(env_file=".env"):
     """Load RPC connection settings from environment variables"""
-    global VERUS_RPC_HOST, VERUS_RPC_PORT, VERUS_RPC_USER, VERUS_RPC_PASSWORD
-    
     try:
         # Try to load .env file if it exists
         if os.path.exists(env_file):
             load_dotenv(env_file)
-            
-        # Parse URL from environment if available
-        # Use only VERUS_RPC_* environment variables for consistency
-        VERUS_RPC_HOST = os.getenv("VERUS_RPC_HOST", VERUS_RPC_HOST)
-        VERUS_RPC_PORT = int(os.getenv("VERUS_RPC_PORT", VERUS_RPC_PORT))
-        VERUS_RPC_USER = os.getenv("VERUS_RPC_USER", VERUS_RPC_USER)
-        VERUS_RPC_PASSWORD = os.getenv("VERUS_RPC_PASSWORD", VERUS_RPC_PASSWORD)
-        
-        print(f"Using RPC connection: {VERUS_RPC_HOST}:{VERUS_RPC_PORT} with user {VERUS_RPC_USER}")
         return True
     except Exception as e:
         print(f"Error loading RPC settings: {str(e)}")
@@ -58,33 +51,18 @@ def make_rpc_call(chain, method, params=None, config=None):
     # Force reload environment variables for each call
     load_dotenv(".env", override=True)
     
-    # Get chain-specific RPC settings
+    # Get chain-specific RPC settings using dynamic environment variable names
+    # Special case for VRSC which uses VERUS_RPC_* in .env file
     if chain == "VRSC":
         host = os.getenv("VERUS_RPC_HOST", "127.0.0.1")
-        port = int(os.getenv("VERUS_RPC_PORT", "27486"))
+        port = int(os.getenv("VERUS_RPC_PORT", get_default_port(chain)))
         user = os.getenv("VERUS_RPC_USER", "user")
         password = os.getenv("VERUS_RPC_PASSWORD", "password")
-    elif chain == "CHIPS":
-        host = os.getenv("CHIPS_RPC_HOST", "127.0.0.1")
-        port = int(os.getenv("CHIPS_RPC_PORT", "22778"))
-        user = os.getenv("CHIPS_RPC_USER", "user")
-        password = os.getenv("CHIPS_RPC_PASSWORD", "password")
-    elif chain == "VARRR":
-        host = os.getenv("VARRR_RPC_HOST", "127.0.0.1")
-        port = int(os.getenv("VARRR_RPC_PORT", "20778"))
-        user = os.getenv("VARRR_RPC_USER", "user")
-        password = os.getenv("VARRR_RPC_PASSWORD", "password")
-    elif chain == "VDEX":
-        host = os.getenv("VDEX_RPC_HOST", "127.0.0.1")
-        port = int(os.getenv("VDEX_RPC_PORT", "21778"))
-        user = os.getenv("VDEX_RPC_USER", "user")
-        password = os.getenv("VDEX_RPC_PASSWORD", "password")
     else:
-        print(f"Warning: Unsupported chain {chain}. Using VRSC settings.")
-        host = os.getenv("VERUS_RPC_HOST", "127.0.0.1")
-        port = int(os.getenv("VERUS_RPC_PORT", "27486"))
-        user = os.getenv("VERUS_RPC_USER", "user")
-        password = os.getenv("VERUS_RPC_PASSWORD", "password")
+        host = os.getenv(f"{chain}_RPC_HOST", "127.0.0.1")
+        port = int(os.getenv(f"{chain}_RPC_PORT", get_default_port(chain)))
+        user = os.getenv(f"{chain}_RPC_USER", "user")
+        password = os.getenv(f"{chain}_RPC_PASSWORD", "password")
     
     print(f"Using RPC connection: {host}:{port} with user {user} for {chain}")
     
